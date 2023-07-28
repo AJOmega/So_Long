@@ -1,31 +1,48 @@
-NAME = so_long.a
-
+NAME = so_long
+SRCS = so_long.c
+OBJS = $(SRCS:.c=.o)
 CC = gcc
-
 CFLAGS = -Wall -Wextra -Werror
+#LDFLAGS = -L./minilibx-linux -lmlx -L./Libft -lft -L/usr/lib -I./minilibx-linux -lX11 -lXext -lm
+LDFLAGS = -L./minilibx-linux -lmlx -L./Libft -lft -lXext -lX11 -lm
+#INCLUDES = -Imx-linux -I./
+INCLUDES = -I./minilibx-linux -I./Libft
 
-RM = rm -f
+MLXFLAGS = -L. -lXext -L. -lX11
 
-# SRC = 
+.c.o:
+				$(CC) $(CFLAGS) -c $< -o $(<:.c=.o)
 
-# OBJ = $(SRC:.c=.o)
+MINILIBX_PATH	=	./minilibx-linux
+MINILIBX		=	$(MINILIBX_PATH)/libmlx.a
 
-# BONUS = 
+LIBFT_PATH		=	./Libft
+libft			=	$(LIBFT_PATH)/libft.a
 
-# BOBJ = $(BONUS:.c=.o)
+all: $(NAME)
 
-# all:	$(NAME)
+# $(NAME): $(OBJS) libft
+# 	$(CC) $(CFLAGS) $(OBJS) $(INCLUDES) $(LDFLAGS) -o $(NAME)
 
-# bonus:	$(BOBJ)
-# 			ar rcs $(NAME) $(BOBJ)
+$(NAME): libft MINILIBX $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) $(libft) $(MINILIBX) -o $(NAME) 
 
-# $(NAME):	$(OBJ)
-# 			ar rcs $(NAME) $(OBJ)
+libft:
+	make -C ./Libft
 
-# clean:
-# 			$(RM) $(OBJ) $(BOBJ)
+MINILIBX:
+	make -C ./minilibx-linux
 
-# fclean:	clean
-# 			$(RM) $(NAME) $(BOBJ)
+clean:
+	rm -f $(OBJS)
+	make -C minilibx-linux clean
+	make -C ./Libft clean
 
-re:	fclean $(NAME)
+fclean: clean
+	rm -f $(NAME)
+	make -C minilibx-linux clean
+	make -C ./Libft fclean
+
+re: fclean all
+
+.PHONY: all clean fclean re
